@@ -34,6 +34,7 @@ if not site_packages:
 isaacsim_site_packages = site_packages / "isaacsim"
 omni_site_packages = site_packages / "omni"
 carb_site_packages = site_packages / "carb"
+pxr_site_packages = site_packages / "pxr"
 
 empty_record = {
     "links": set(),
@@ -63,6 +64,15 @@ def check_base_paths():
             save_record(links, dirs)
         except Exception as e:
             logger.error(f"Failed to create carb directory: {e}")
+    if not pxr_site_packages.exists():
+        logger.warning(f"PXR directory not found: {pxr_site_packages}")
+        try:
+            pxr_site_packages.mkdir(parents=True, exist_ok=True)
+            logger.info(f"Created directory: {pxr_site_packages}")
+            dirs.add(str(pxr_site_packages))
+            save_record(links, dirs)
+        except Exception as e:
+            logger.error(f"Failed to create PXR directory: {e}")
 
     return
 
@@ -76,7 +86,7 @@ def get_ext_configs():
             "name": "isaacsim.exts",
             "exts_dir": isaacsim_site_packages / "exts",
             # "prefix": ["isaacsim.", "omni."],
-            "prefix": ["isaacsim."],
+            "prefix": ["isaacsim.", "omni."],
             "description": "Isaac Sim Standard Extensions",
         },
         {
@@ -94,7 +104,7 @@ def get_ext_configs():
         {
             "name": "isaacsim.extscache",
             "exts_dir": isaacsim_site_packages / "extscache",
-            "prefix": ["isaacsim."], # "omni.", "carb.", 
+            "prefix": ["isaacsim.", "omni.", "carb.", "pxr."], # "omni.", "carb.", 
             "description": "Isaac Sim Extension Cache",
         },
     ]
@@ -107,6 +117,7 @@ def get_target_base(prefix: str):
         "isaacsim": isaacsim_site_packages,
         "omni": omni_site_packages,
         "carb": carb_site_packages,
+        "pxr": pxr_site_packages,
     }[prefix.rstrip(".")]
 
 
@@ -585,6 +596,7 @@ def remove_links():
                     isaacsim_site_packages,
                     omni_site_packages,
                     carb_site_packages,
+                    pxr_site_packages,
                 ]
                 while (
                     current_parent.exists()
